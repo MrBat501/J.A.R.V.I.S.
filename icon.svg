@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F2FDFF"/>
+      <stop offset="45%" stop-color="#8FE3EE"/>
+      <stop offset="100%" stop-color="#1C6E7A" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="100" height="100" rx="20" fill="#0F1626"/>
+
+  <!-- halo del reactor -->
+  <circle cx="50" cy="50" r="34" fill="url(#coreGlow)" opacity="0.5"/>
+
+  <!-- anillo exterior segmentado -->
+  <circle cx="50" cy="50" r="30" fill="none" stroke="#12313A" stroke-width="7"/>
+  <g stroke="#5FD3E0" stroke-width="3" stroke-linecap="round" opacity="0.9">
+    <line x1="50" y1="17" x2="50" y2="23"/>
+    <line x1="50" y1="77" x2="50" y2="83"/>
+    <line x1="17" y1="50" x2="23" y2="50"/>
+    <line x1="83" y1="50" x2="77" y2="50"/>
+    <line x1="26.5" y1="26.5" x2="31" y2="31"/>
+    <line x1="73.5" y1="73.5" x2="69" y2="69"/>
+    <line x1="26.5" y1="73.5" x2="31" y2="69"/>
+    <line x1="73.5" y1="26.5" x2="69" y2="31"/>
+  </g>
+
+  <!-- núcleo triangular -->
+  <polygon points="50,35 63,58 37,58" fill="none" stroke="#BFF3FA" stroke-width="3.4" stroke-linejoin="round" filter="url(#softGlow)"/>
+  <circle cx="50" cy="52" r="7" fill="url(#coreGlow)" filter="url(#softGlow)"/>
+</svg>
