@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/friday.js": {
+      "runtime": "nodejs22.x"
+    }
+  }
+}
