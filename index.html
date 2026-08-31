@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0F1626" />
+<title>Friday — Bitácora personal</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="phone-frame">
+
+  <!-- ===== BANNER DE CONEXIÓN (solo se muestra si hay un problema) ===== -->
+  <div class="conn-banner" id="connBanner" hidden></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="deck-header">
+    <div class="header-text">
+      <p class="eyebrow" id="dateLine">Cargando fecha…</p>
+      <h1 class="greeting" id="greetingLine">Hola, Jefe</h1>
+      <p class="subline" id="taskSummary">Cargando bitácora…</p>
+    </div>
+
+    <div class="dial" role="img" aria-label="Progreso de tareas de hoy">
+      <svg viewBox="0 0 120 120" class="dial-svg">
+        <circle class="dial-track" cx="60" cy="60" r="50" />
+        <circle class="dial-progress" id="dialProgress" cx="60" cy="60" r="50" />
+        <g class="dial-ticks" id="dialTicks"></g>
+      </svg>
+      <div class="dial-center">
+        <span class="dial-value" id="dialValue">0%</span>
+        <span class="dial-label">hoy</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN: SCREENS ===== -->
+  <main class="deck-main">
+
+    <!-- ---- PANTALLA: TAREAS ---- -->
+    <section class="screen" id="screen-tareas" data-screen="tareas">
+      <div class="screen-heading">
+        <h2>Registro de tareas</h2>
+        <button class="btn-add" id="btnAddTask" aria-label="Agregar tarea">+</button>
+      </div>
+
+      <div class="filter-row">
+        <button class="chip is-active" data-filter="todas">Todas</button>
+        <button class="chip" data-filter="escolar">Escolares</button>
+        <button class="chip" data-filter="personal">Personales</button>
+      </div>
+
+      <ul class="task-list" id="taskList"></ul>
+
+      <p class="empty-note" id="taskEmptyNote" hidden>No hay entradas en este filtro. Añade una nueva.</p>
+    </section>
+
+    <!-- ---- PANTALLA: CONTACTOS ---- -->
+    <section class="screen" id="screen-contactos" data-screen="contactos" hidden>
+      <div class="screen-heading">
+        <h2>Conocidos</h2>
+        <button class="btn-add" id="btnAddContact" aria-label="Agregar contacto">+</button>
+      </div>
+
+      <input class="search-input" id="contactSearch" type="text" placeholder="Buscar por nombre o etiqueta…" />
+
+      <ul class="contact-list" id="contactList"></ul>
+    </section>
+
+    <!-- ---- PANTALLA: FRIDAY (asistente) ---- -->
+    <section class="screen" id="screen-friday" data-screen="friday" hidden>
+      <div class="screen-heading">
+        <h2>Friday</h2>
+        <span class="status-dot" id="fridayStatusDot" title="Conectado"></span>
+      </div>
+
+      <div class="chat-log" id="chatLog">
+        <div class="chat-bubble bubble-friday">
+          Hola, Jefe. Puedo ver tus tareas y contactos actuales — pregúntame lo que necesites.
+        </div>
+      </div>
+
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Escribe un comando…" />
+        <button class="mic-btn" disabled aria-label="Comando de voz (próximamente)">🎙</button>
+        <button class="send-btn" id="btnSendChat" aria-label="Enviar">➤</button>
+      </div>
+      <p class="empty-note">Comandos de voz se activan en la Fase 6.</p>
+    </section>
+
+  </main>
+
+  <!-- ===== NAV INFERIOR ===== -->
+  <nav class="bottom-nav">
+    <button class="nav-btn is-active" data-target="tareas">
+      <span class="nav-icon" aria-hidden="true">☰</span>
+      <span class="nav-label">Tareas</span>
+    </button>
+    <button class="nav-btn" data-target="contactos">
+      <span class="nav-icon" aria-hidden="true">◍</span>
+      <span class="nav-label">Contactos</span>
+    </button>
+    <button class="nav-btn" data-target="friday">
+      <span class="nav-icon" aria-hidden="true">✦</span>
+      <span class="nav-label">Friday</span>
+    </button>
+  </nav>
+
+  <!-- ===== MODAL: CREAR / EDITAR TAREA ===== -->
+  <div class="modal-overlay" id="taskModalOverlay" hidden>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">Nueva tarea</h3>
+        <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="taskForm">
+        <label class="field-label" for="fieldTitle">Título</label>
+        <input class="field-input" id="fieldTitle" type="text" placeholder="¿Qué hay que hacer?" required />
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="fieldDate">Fecha</label>
+            <input class="field-input" id="fieldDate" type="date" />
+          </div>
+          <div>
+            <label class="field-label" for="fieldTime">Hora</label>
+            <input class="field-input" id="fieldTime" type="time" />
+          </div>
+        </div>
+
+        <label class="field-label">Categoría</label>
+        <div class="segmented" id="fieldCategory">
+          <button type="button" class="segment is-active" data-value="escolar">Escolar</button>
+          <button type="button" class="segment" data-value="personal">Personal</button>
+        </div>
+
+        <label class="field-label">Prioridad</label>
+        <div class="segmented" id="fieldPriority">
+          <button type="button" class="segment priority-baja" data-value="baja">Baja</button>
+          <button type="button" class="segment is-active priority-media" data-value="media">Media</button>
+          <button type="button" class="segment priority-alta" data-value="alta">Alta</button>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-danger" id="btnDeleteTask" hidden>Eliminar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: CREAR / EDITAR CONTACTO (estilo expediente) ===== -->
+  <div class="modal-overlay" id="contactModalOverlay" hidden>
+    <div class="modal-panel dossier-panel" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+      <div class="dossier-stamp">CONFIDENCIAL</div>
+
+      <div class="modal-header">
+        <div>
+          <p class="dossier-eyebrow">Expediente personal <span id="dossierFileNumber">N.º 000</span></p>
+          <h3 id="contactModalTitle">Nuevo contacto</h3>
+        </div>
+        <button class="modal-close" id="contactModalClose" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="contactForm">
+
+        <div class="dossier-photo-row">
+          <button type="button" class="dossier-photo-frame" id="btnPhotoUpload" aria-label="Agregar foto">
+            <img id="photoPreview" class="dossier-photo-img" hidden />
+            <span class="dossier-photo-placeholder" id="photoPlaceholder">＋<br />FOTO</span>
+          </button>
+          <input type="file" accept="image/*" id="fieldContactPhoto" hidden />
+          <div class="dossier-photo-caption">Toca el recuadro para subir<br />una foto desde tu galería.</div>
+        </div>
+
+        <div class="dossier-divider">DATOS DE IDENTIFICACIÓN</div>
+
+        <label class="field-label" for="fieldContactName">Nombre completo</label>
+        <input class="field-input" id="fieldContactName" type="text" placeholder="Nombre completo" required />
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="fieldContactPhone">Teléfono</label>
+            <input class="field-input" id="fieldContactPhone" type="tel" placeholder="—" />
+          </div>
+          <div>
+            <label class="field-label" for="fieldContactEmail">Correo</label>
+            <input class="field-input" id="fieldContactEmail" type="email" placeholder="—" />
+          </div>
+        </div>
+
+        <label class="field-label" for="fieldContactAddress">Dirección</label>
+        <input class="field-input" id="fieldContactAddress" type="text" placeholder="—" />
+
+        <div class="dossier-divider">DATOS MÉDICOS</div>
+
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="fieldContactBlood">Tipo de sangre</label>
+            <input class="field-input" id="fieldContactBlood" type="text" placeholder="Ej. O+" />
+          </div>
+          <div>
+            <label class="field-label" for="fieldContactAllergies">Alergias</label>
+            <input class="field-input" id="fieldContactAllergies" type="text" placeholder="—" />
+          </div>
+        </div>
+
+        <div class="dossier-divider">NOTAS DEL CASO</div>
+
+        <label class="field-label" for="fieldContactTags">Etiquetas</label>
+        <input class="field-input" id="fieldContactTags" type="text" placeholder="Ej. Profesor, Historia (separadas por coma)" />
+
+        <label class="field-label" for="fieldContactNote">Nota</label>
+        <textarea class="field-input field-textarea" id="fieldContactNote" rows="3" placeholder="Contexto, recordatorios…"></textarea>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-danger" id="btnDeleteContact" hidden>Eliminar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
