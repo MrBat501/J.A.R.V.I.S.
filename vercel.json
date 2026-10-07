@@ -1,7 +1,0 @@
-{
-  "functions": {
-    "api/friday.js": {
-      "maxDuration": 10
-    }
-  }
-}
