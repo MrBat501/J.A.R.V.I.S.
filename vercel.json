@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/friday.js": {
+      "maxDuration": 10
+    },
+    "api/send-task-reminders.js": {
+      "maxDuration": 15
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/send-task-reminders",
+      "schedule": "0 11 * * *"
+    }
+  ]
+}
